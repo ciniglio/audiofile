@@ -14,13 +14,17 @@ module Audiofile
       @raw = @file.unpack('a*').first
     end
 
-    def data
-      @raw[36..-1]
+    def data_chunk
+      chunks.select{|c| c.name == "data"}.first.payload
+    end
+
+    def fmt_chunk
+      chunks.select{|c| c.name == "fmt "}.first.payload
     end
 
     def left
       if !@left
-        parse_header @raw
+        parse_header
         parse_data data
       end
       @left
@@ -28,7 +32,7 @@ module Audiofile
 
     def right
       if !@right
-        parse_header @raw
+        parse_header
         parse_data data
       end
       @right
@@ -36,46 +40,63 @@ module Audiofile
 
     def sample_rate
       if !@sample_rate
-        parse_header @raw
+        parse_header
       end
       @sample_rate
     end
 
     def bits_per_sample
       if !@bits_per_sample
-        parse_header @raw
+        parse_header
       end
       @bits_per_sample
     end
 
     def num_channels
       if !@num_channels
-        parse_header @raw
+        parse_header
       end
       @num_channels
     end
 
     def filesize
       if !@filesize
-        parse_header @raw
+        parse_header
       end
       @filesize
     end
 
-    private
-    def parse_header(raw)
-      raise "Invalid File" unless raw[0..3] == "RIFF" and raw[8..11] == "WAVE"
-      @filesize = raw[4..7].unpack('L<').first + 8
-      raise "Please use uncompressed wav" unless
-        raw[20..21].unpack('S<').first == 1
-      @num_channels = raw[22..23].unpack('S<').first
-      @sample_rate = raw[24..27].unpack('L<').first
-      @bits_per_sample = raw[34..35].unpack('S<').first
+    def chunks
+      if !@chunks
+        chunk
+      end
+      @chunks
     end
 
+    private
+    def parse_header
+      raise "Please use uncompressed wav" unless
+        fmt_chunk[0..1].unpack('S<').first == 1
+      @num_channels = fmt_chunk[2..3].unpack('S<').first
+      @sample_rate = fmt_chunk[4..7].unpack('L<').first
+      @bits_per_sample = fmt_chunk[14..15].unpack('S<').first
+    end
 
-    def parse_data(data)
-      raise "Unknown error" unless data[0..3] == "data"
+    def chunk
+      raise "Invalid File" unless @raw[0..3] == "RIFF" and @raw[8..11] == "WAVE"
+      @filesize = @raw[4..7].unpack('L<').first + 8
+      counter = 12
+      @chunks = []
+      while counter < filesize
+        name = @raw[counter..counter+3]
+        size = @raw[counter+4..counter+7].unpack('L<').first
+        payload = @raw[counter+8..counter+8+size-1]
+        counter += 8 + size
+        @chunks << Chunk.new(name, size, payload)
+      end
+    end
+
+    def parse_data(data_chunk)
       if @bits_per_sample == 8
         sample_fmt = 'C'
         sample_size = 1
@@ -85,15 +106,24 @@ module Audiofile
       end
       @left = []
       @right = []
-      i = 8
-      bytes_left = data[4..7].unpack('L<').first
+      bytes_left = data_chunk.size
 
-      while (i < bytes_left + 8)
+      while (i < bytes_left)
         @left << data[i..i+sample_size].unpack(sample_fmt).first
         i += sample_size
         @right << data[i..i+sample_size].unpack(sample_fmt).first
         i += sample_size
       end
+    end
+  end
+
+  class Chunk
+    attr_accessor :name, :size, :payload
+
+    def initialize(name, size, payload)
+      @name = name
+      @size = size
+      @payload = payload
     end
   end
 end
