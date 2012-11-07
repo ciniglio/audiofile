@@ -1,6 +1,6 @@
 # Audiofile
 
-TODO: Write a gem description
+Parses WAV files lazily. This makes operations much faster than other libraries.
 
 ## Installation
 
@@ -18,7 +18,23 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+To initialize a file:
+    
+    a = Audiofile::WavFile.new 'myfile.wav'
+    
+To get the samples as a string of bytes (great for parsing with C):
+    
+    d = a.data_chunk
+    
+To get info about the file:
+
+    a.sample_rate
+    a.num_channels
+    
+To get the left and right channel as array of integers:
+
+    a.left
+    a.right
 
 ## Contributing
 

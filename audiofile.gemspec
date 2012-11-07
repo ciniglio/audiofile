@@ -4,8 +4,9 @@ require File.expand_path('../lib/audiofile/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Alejandro Ciniglio"]
   gem.email         = ["mail@alejandrociniglio.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Gem to parse Audio files and provide
+samples as a string of bytes}
+  gem.summary       = %q{Gem to parse .Wav files}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
