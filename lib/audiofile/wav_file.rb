@@ -45,7 +45,21 @@ module Audiofile
       if !@bits_per_sample
         parse_header @raw
       end
-      @sample_rate
+      @bits_per_sample
+    end
+
+    def num_channels
+      if !@num_channels
+        parse_header @raw
+      end
+      @num_channels
+    end
+
+    def filesize
+      if !@filesize
+        parse_header @raw
+      end
+      @filesize
     end
 
     private
