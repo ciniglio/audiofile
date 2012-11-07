@@ -96,7 +96,7 @@ module Audiofile
       end
     end
 
-    def parse_data(data_chunk)
+    def parse_data
       if @bits_per_sample == 8
         sample_fmt = 'C'
         sample_size = 1
