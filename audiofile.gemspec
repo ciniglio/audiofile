@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{Gem to parse Audio files and provide
 samples as a string of bytes}
   gem.summary       = %q{Gem to parse .Wav files}
-  gem.homepage      = ""
+  gem.homepage      = "http://github.com/ciniglio/audiofile"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
