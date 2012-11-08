@@ -25,7 +25,7 @@ module Audiofile
     def left
       if !@left
         parse_header
-        parse_data data
+        parse_data
       end
       @left
     end
@@ -33,7 +33,7 @@ module Audiofile
     def right
       if !@right
         parse_header
-        parse_data data
+        parse_data
       end
       @right
     end
@@ -107,11 +107,11 @@ module Audiofile
       @left = []
       @right = []
       bytes_left = data_chunk.size
-
+      i = 0
       while (i < bytes_left)
-        @left << data[i..i+sample_size].unpack(sample_fmt).first
+        @left << data_chunk[i..i+sample_size].unpack(sample_fmt).first
         i += sample_size
-        @right << data[i..i+sample_size].unpack(sample_fmt).first
+        @right << data_chunk[i..i+sample_size].unpack(sample_fmt).first
         i += sample_size
       end
     end
