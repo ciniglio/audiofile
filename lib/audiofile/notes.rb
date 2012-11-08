@@ -109,4 +109,34 @@ module Audiofile
     Bb_8:   7459,
     B_8:    7902,
   }
+
+  def Audiofile::find_closest_note(freq)
+    f = binary_search(freq, Audiofile::NOTES.values)
+    Audiofile::NOTES.key(f)
+  end
+
+  def Audiofile::binary_search(val, arr)
+    s = arr.size
+    if s == 1
+      arr[0]
+    end
+    midp = arr[s/2]
+    midl = arr[s/2-1]
+    if val >= midl and val <= midp
+      find_closest(val, midl, midp)
+    elsif val < midl
+      binary_search(val, arr[0..s/2 - 1])
+    else
+      binary_search(val, arr[s/2..-1])
+    end
+  end
+
+  def Audiofile::find_closest(x, y, z)
+    if (x-y).abs < (x-z).abs
+      y
+    else
+      z
+    end
+  end
+
 end
